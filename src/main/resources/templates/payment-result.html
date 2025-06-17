@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">Payment Receipt - TravelPro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f7fa;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        /* Main Container */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Success Message */
+        .payment-status {
+            text-align: center;
+            padding: 3rem 2rem;
+            margin-bottom: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .payment-status.success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+        
+        .payment-status.failed {
+            background: linear-gradient(135deg, #dc3545, #fd7e14);
+            color: white;
+        }
+        
+        .status-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .status-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        
+        .status-message {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        /* Receipt */
+        .receipt {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .receipt-header {
+            text-align: center;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid #f8f9fa;
+            margin-bottom: 2rem;
+        }
+        
+        .receipt-title {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .transaction-id {
+            font-size: 1.2rem;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        /* Receipt Details */
+        .receipt-section {
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e1e1e1;
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        .detail-item {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .detail-label {
+            font-size: 0.9rem;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .detail-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .detail-value.amount {
+            font-size: 1.3rem;
+            color: #28a745;
+        }
+        
+        .detail-value.failed {
+            color: #dc3545;
+        }
+        
+        /* Payment Method Badge */
+        .payment-method-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #667eea;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        /* Status Badge */
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        /* Booking Summary */
+        .booking-summary {
+            background: #e7f3ff;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .booking-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #004085;
+            margin-bottom: 0.5rem;
+        }
+        
+        .booking-details {
+            color: #004085;
+        }
+        
+        /* Amount Summary */
+        .amount-summary {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 2rem;
+        }
+        
+        .amount-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem 0;
+        }
+        
+        .amount-row.total {
+            border-top: 2px solid #e1e1e1;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+        
+        /* Actions */
+        .actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 3rem;
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            text-align: center;
+            transition: transform 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .btn-print {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-print:hover {
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
+        
+        /* Print Styles */
+        @media print {
+            .header, .actions {
+                display: none;
+            }
+            
+            body {
+                background: white;
+            }
+            
+            .receipt {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .status-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <a href="/" class="logo">🌍 TravelPro</a>
+            <div class="nav-links">
+                <a href="/dashboard">Dashboard</a>
+                <a href="/packages">Packages</a>
+                <a href="/bookings">My Bookings</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Payment Status -->
+        <div class="payment-status" th:classappend="${payment.successful} ? 'success' : 'failed'">
+            <div class="status-icon" th:text="${payment.successful} ? '✅' : '❌'">✅</div>
+            <h1 class="status-title" th:text="${payment.successful} ? 'Payment Successful!' : 'Payment Failed'">Payment Successful!</h1>
+            <p class="status-message" th:if="${payment.successful}">Your payment has been processed successfully</p>
+            <p class="status-message" th:unless="${payment.successful}">There was an issue processing your payment</p>
+        </div>
+
+        <!-- Payment Receipt -->
+        <div class="receipt">
+            <div class="receipt-header">
+                <h2 class="receipt-title">Payment Receipt</h2>
+                <div class="transaction-id" th:text="'Transaction ID: ' + ${payment.transactionId}">Transaction ID: TXN123456</div>
+            </div>
+
+            <!-- Payment Details -->
+            <div class="receipt-section">
+                <h3 class="section-title">Payment Information</h3>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Amount Paid</div>
+                        <div class="detail-value amount" th:text="${payment.formattedAmount}">₹10,000</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Payment Method</div>
+                        <div class="detail-value">
+                            <span class="payment-method-badge">
+                                <span th:switch="${payment.paymentMethod.name()}">
+                                    <span th:case="'CREDIT_CARD'">💳</span>
+                                    <span th:case="'DEBIT_CARD'">💳</span>
+                                    <span th:case="'UPI'">📱</span>
+                                    <span th:case="'NET_BANKING'">🏦</span>
+                                    <span th:case="*">💰</span>
+                                </span>
+                                <span th:text="${payment.paymentMethod}">CREDIT_CARD</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Payment Date</div>
+                        <div class="detail-value" th:text="${#temporals.format(payment.paymentDate, 'dd MMM yyyy HH:mm')}">17 Jun 2025 14:30</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Status</div>
+                        <div class="detail-value">
+                            <span class="status-badge" 
+                                  th:classappend="${payment.successful} ? 'status-success' : 'status-failed'"
+                                  th:text="${payment.status}">SUCCESS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Details (if applicable) -->
+                <div th:if="${payment.cardNumber}" style="margin-top: 1rem;">
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Card Number</div>
+                            <div class="detail-value" th:text="${payment.cardNumber}">**** **** **** 1234</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Card Holder</div>
+                            <div class="detail-value" th:text="${payment.cardHolderName}">John Doe</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gateway Info -->
+                <div th:if="${payment.gatewayTransactionId}" style="margin-top: 1rem;">
+                    <div class="detail-item">
+                        <div class="detail-label">Gateway Transaction ID</div>
+                        <div class="detail-value" th:text="${payment.gatewayTransactionId}">GTW789012</div>
+                    </div>
+                </div>
+
+                <!-- Failure Reason -->
+                <div th:if="${!payment.successful and payment.failureReason}" style="margin-top: 1rem;">
+                    <div class="detail-item">
+                        <div class="detail-label">Failure Reason</div>
+                        <div class="detail-value failed" th:text="${payment.failureReason}">Payment declined by gateway</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Details -->
+            <div class="receipt-section">
+                <h3 class="section-title">Booking Information</h3>
+                <div class="booking-summary">
+                    <div class="booking-title" th:text="${booking.travelPackage.name}">Goa Beach Paradise</div>
+                    <div class="booking-details">
+                        <strong>Booking Reference:</strong> <span th:text="${booking.bookingReference}">TP123456</span><br>
+                        <strong>Destination:</strong> <span th:text="${booking.travelPackage.destination}">Goa</span><br>
+                        <strong>Travel Date:</strong> <span th:text="${#temporals.format(booking.travelDate, 'dd MMM yyyy')}">25 Jun 2025</span><br>
+                        <strong>Travelers:</strong> <span th:text="${booking.numberOfTravelers}">2</span> people
+                    </div>
+                </div>
+            </div>
+
+            <!-- Amount Summary -->
+            <div class="amount-summary">
+                <div class="amount-row">
+                    <span>Total Booking Amount:</span>
+                    <span th:text="${booking.formattedTotalAmount}">₹30,000</span>
+                </div>
+                <div class="amount-row">
+                    <span>Previously Paid:</span>
+                    <span th:text="${booking.formattedPaidAmount}">₹20,000</span>
+                </div>
+                <div class="amount-row">
+                    <span>This Payment:</span>
+                    <span th:text="${payment.formattedAmount}">₹10,000</span>
+                </div>
+                <div class="amount-row total">
+                    <span>Remaining Balance:</span>
+                    <span th:text="${booking.formattedPendingAmount}">₹0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions">
+            <button onclick="window.print()" class="btn btn-print">🖨️ Print Receipt</button>
+            <a th:href="@{'/bookings/' + ${booking.id}}" class="btn btn-primary">View Booking Details</a>
+            <a href="/bookings" class="btn btn-secondary">My Bookings</a>
+            <a href="/packages" class="btn btn-secondary" th:if="${!payment.successful}">Browse Packages</a>
+        </div>
+    </div>
+</body>
+</html>

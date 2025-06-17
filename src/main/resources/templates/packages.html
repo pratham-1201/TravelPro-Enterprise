@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">Travel Packages - TravelPro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f7fa;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .page-header h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .page-header p {
+            font-size: 1.2rem;
+            color: #666;
+        }
+        
+        /* Search and Filter Section */
+        .search-filter {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 3rem;
+        }
+        
+        .search-form {
+            display: grid;
+            grid-template-columns: 2fr 1fr auto;
+            gap: 1rem;
+            align-items: end;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select {
+            padding: 0.75rem;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .search-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Results Info */
+        .results-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1rem 0;
+        }
+        
+        .results-count {
+            font-size: 1.1rem;
+            color: #666;
+        }
+        
+        .clear-filters {
+            background: #f8f9fa;
+            color: #667eea;
+            border: 1px solid #667eea;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .clear-filters:hover {
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+        }
+        
+        /* Packages Grid */
+        .packages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .package-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .package-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        
+        .package-image {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .package-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255,255,255,0.9);
+            color: #667eea;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .package-content {
+            padding: 2rem;
+        }
+        
+        .package-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .package-destination {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .package-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .package-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .detail-item {
+            text-align: center;
+        }
+        
+        .detail-label {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        
+        .detail-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+            margin-top: 0.25rem;
+        }
+        
+        .package-price {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        
+        .package-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn-primary {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .btn-secondary {
+            flex: 1;
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .empty-state h2 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state p {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+        
+        .create-packages-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+        
+        .create-packages-btn:hover {
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
+        
+        /* Messages */
+        .message {
+            background: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #28a745;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left-color: #dc3545;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .search-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .packages-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .package-actions {
+                flex-direction: column;
+            }
+            
+            .results-info {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <a href="/" class="logo">🌍 TravelPro</a>
+            <div class="nav-links">
+                <a href="/dashboard">Dashboard</a>
+                <a href="/packages">Packages</a>
+                <a href="/bookings">My Bookings</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>Discover Amazing Travel Packages</h1>
+            <p>Find your perfect getaway from our curated collection of destinations</p>
+        </div>
+
+        <!-- Messages -->
+        <div th:if="${message}" class="message" th:text="${message}"></div>
+        <div th:if="${error}" class="message error" th:text="${error}"></div>
+
+        <!-- Search and Filter -->
+        <div class="search-filter">
+            <form class="search-form" th:action="@{/packages}" method="get">
+                <div class="form-group">
+                    <label for="search">Search Destinations</label>
+                    <input type="text" id="search" name="search" 
+                           placeholder="Search by destination, name, or description..."
+                           th:value="${searchTerm}">
+                </div>
+                <div class="form-group">
+                    <label for="type">Package Type</label>
+                    <select id="type" name="type">
+                        <option value="">All Types</option>
+                        <option th:each="packageType : ${packageTypes}" 
+                                th:value="${packageType}" 
+                                th:text="${packageType}"
+                                th:selected="${packageType == selectedType}">Type</option>
+                    </select>
+                </div>
+                <button type="submit" class="search-btn">Search</button>
+            </form>
+        </div>
+
+        <!-- Results Info -->
+        <div class="results-info" th:if="${packages != null}">
+            <div class="results-count">
+                <span th:text="${totalPackages}">0</span> packages found
+                <span th:if="${searchTerm}" th:text="' for \'' + ${searchTerm} + '\''"></span>
+                <span th:if="${selectedType}" th:text="' in ' + ${selectedType} + ' category'"></span>
+            </div>
+            <a href="/packages" class="clear-filters" th:if="${searchTerm != null or selectedType != null}">
+                Clear Filters
+            </a>
+        </div>
+
+        <!-- Packages Grid -->
+        <div class="packages-grid" th:if="${packages != null and !packages.isEmpty()}">
+            <div class="package-card" th:each="package : ${packages}">
+                <div class="package-image" th:style="'background-image: url(' + ${package.imageUrl} + ')'">
+                    <div class="package-badge" th:text="${package.packageType}">LEISURE</div>
+                </div>
+                <div class="package-content">
+                    <h3 class="package-title" th:text="${package.name}">Package Name</h3>
+                    <div class="package-destination">
+                        📍 <span th:text="${package.destination}">Destination</span>
+                    </div>
+                    <p class="package-description" th:text="${package.description}">Description</p>
+                    
+                    <div class="package-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Duration</div>
+                            <div class="detail-value" th:text="${package.durationDays} + ' Days'">5 Days</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Available</div>
+                            <div class="detail-value" th:text="${package.availableSlots} + ' Slots'">25 Slots</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Status</div>
+                            <div class="detail-value" th:text="${package.available} ? 'Available' : 'Full'">Available</div>
+                        </div>
+                    </div>
+                    
+                    <div class="package-price" th:text="${package.formattedPrice}">₹15,000</div>
+                    
+                    <div class="package-actions">
+                        <a th:href="@{'/packages/' + ${package.id}}" class="btn-primary">View Details</a>
+                        <a th:href="@{'/packages/' + ${package.id} + '/book'}" class="btn-secondary">Book Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" th:if="${packages == null or packages.isEmpty()}">
+            <h2>No Packages Available</h2>
+            <p th:if="${searchTerm == null and selectedType == null}">
+                We don't have any travel packages yet. Create some sample packages to get started!
+            </p>
+            <p th:if="${searchTerm != null or selectedType != null}">
+                No packages match your search criteria. Try adjusting your filters or search terms.
+            </p>
+            <a href="/test-packages" class="create-packages-btn" th:if="${packages == null or (packages.isEmpty() and searchTerm == null and selectedType == null)}">
+                Create Sample Packages
+            </a>
+            <a href="/packages" class="create-packages-btn" th:if="${packages != null and packages.isEmpty() and (searchTerm != null or selectedType != null)}">
+                View All Packages
+            </a>
+        </div>
+    </div>
+</body>
+</html>

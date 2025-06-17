@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">Booking Details - TravelPro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f7fa;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        /* Main Container */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Success Message */
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 3rem;
+            border-left: 4px solid #28a745;
+            text-align: center;
+        }
+        
+        .success-message h2 {
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+        
+        .success-message .booking-ref {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #0c5a26;
+            margin: 1rem 0;
+        }
+        
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 3rem;
+        }
+        
+        /* Booking Details */
+        .booking-details {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            color: #333;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .detail-item {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .detail-label {
+            font-size: 0.9rem;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .detail-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-confirmed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .payment-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .payment-paid {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        /* Package Info */
+        .package-info {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .package-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            background-size: cover;
+            background-position: center;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .package-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .package-destination {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Traveler Info */
+        .traveler-info {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+        
+        /* Special Requests */
+        .special-requests {
+            background: #e7f3ff;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid #007bff;
+            margin-bottom: 2rem;
+        }
+        
+        /* Payment Summary */
+        .payment-summary {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 2rem;
+        }
+        
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        
+        .price-row.total {
+            font-weight: bold;
+            font-size: 1.3rem;
+            color: #667eea;
+            border-top: 2px solid #f8f9fa;
+            padding-top: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        /* Actions */
+        .actions {
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .btn-danger {
+            background: transparent;
+            color: #dc3545;
+            border: 2px solid #dc3545;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-danger:hover {
+            background: #dc3545;
+            color: white;
+            text-decoration: none;
+        }
+        
+        /* Important Notes */
+        .important-notes {
+            background: #fff3cd;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid #ffc107;
+            margin-top: 2rem;
+        }
+        
+        .important-notes h4 {
+            color: #856404;
+            margin-bottom: 1rem;
+        }
+        
+        .important-notes ul {
+            color: #856404;
+            padding-left: 1.5rem;
+        }
+        
+        .important-notes li {
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <a href="/" class="logo">🌍 TravelPro</a>
+            <div class="nav-links">
+                <a href="/dashboard">Dashboard</a>
+                <a href="/packages">Packages</a>
+                <a href="/bookings">My Bookings</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Success Message -->
+        <div class="success-message" th:if="${success}">
+            <h2>🎉 Booking Confirmed!</h2>
+            <p th:text="${success}">Booking successful message</p>
+            <div class="booking-ref">Reference: <span th:text="${booking.bookingReference}">TP123456</span></div>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="content-grid">
+            <!-- Main Details -->
+            <div>
+                <!-- Package Info -->
+                <div class="package-info">
+                    <div class="package-image" th:style="'background-image: url(' + ${booking.travelPackage.imageUrl} + ')'"></div>
+                    <h2 class="package-title" th:text="${booking.travelPackage.name}">Package Name</h2>
+                    <div class="package-destination">
+                        📍 <span th:text="${booking.travelPackage.destination}">Destination</span>
+                    </div>
+                    <p th:text="${booking.travelPackage.description}">Package description</p>
+                </div>
+
+                <!-- Booking Details -->
+                <div class="booking-details">
+                    <h3 class="section-title">Booking Information</h3>
+                    
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Booking Reference</div>
+                            <div class="detail-value" th:text="${booking.bookingReference}">TP123456</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Booking Date</div>
+                            <div class="detail-value" th:text="${#temporals.format(booking.bookingDate, 'dd MMM yyyy HH:mm')}">01 Jan 2024 10:30</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Travel Date</div>
+                            <div class="detail-value" th:text="${#temporals.format(booking.travelDate, 'dd MMM yyyy')}">15 Jan 2024</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Duration</div>
+                            <div class="detail-value" th:text="${booking.travelPackage.durationDays} + ' Days'">5 Days</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Number of Travelers</div>
+                            <div class="detail-value" th:text="${booking.numberOfTravelers}">2</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Booking Status</div>
+                            <div class="detail-value">
+                                <span class="status-badge" 
+                                      th:classappend="${booking.status.name() == 'PENDING'} ? 'status-pending' : 
+                                                     (${booking.status.name() == 'CONFIRMED'} ? 'status-confirmed' : 'status-cancelled')"
+                                      th:text="${booking.status}">PENDING</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Traveler Information -->
+                    <div class="traveler-info">
+                        <h4>Contact Information</h4>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <div class="detail-label">Primary Contact</div>
+                                <div class="detail-value" th:text="${booking.user.name}">John Doe</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Email</div>
+                                <div class="detail-value" th:text="${booking.user.email}">john@example.com</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Phone</div>
+                                <div class="detail-value" th:text="${booking.contactPhone}">+91 9876543210</div>
+                            </div>
+                            <div class="detail-item" th:if="${booking.emergencyContact}">
+                                <div class="detail-label">Emergency Contact</div>
+                                <div class="detail-value">
+                                    <span th:text="${booking.emergencyContact}">Emergency Name</span>
+                                    <br th:if="${booking.emergencyPhone}">
+                                    <small th:text="${booking.emergencyPhone}">Emergency Phone</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Special Requests -->
+                    <div class="special-requests" th:if="${booking.specialRequests}">
+                        <h4>Special Requests</h4>
+                        <p th:text="${booking.specialRequests}">Special requests text</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div>
+                <!-- Payment Summary -->
+                <div class="payment-summary">
+                    <h3 class="section-title">Payment Summary</h3>
+                    
+                    <div class="price-row">
+                        <span>Package Price:</span>
+                        <span th:text="${booking.travelPackage.formattedPrice}">₹15,000</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Number of Travelers:</span>
+                        <span th:text="${booking.numberOfTravelers}">2</span>
+                    </div>
+                    <div class="price-row total">
+                        <span>Total Amount:</span>
+                        <span th:text="${booking.formattedTotalAmount}">₹30,000</span>
+                    </div>
+                    
+                    <div style="margin-top: 1.5rem;">
+                        <div class="price-row">
+                            <span>Paid Amount:</span>
+                            <span th:text="${booking.formattedPaidAmount}">₹0</span>
+                        </div>
+                        <div class="price-row">
+                            <span>Pending Amount:</span>
+                            <span th:text="${booking.formattedPendingAmount}">₹30,000</span>
+                        </div>
+                        <div class="price-row">
+                            <span>Payment Status:</span>
+                            <span class="status-badge" 
+                                  th:classappend="${booking.paymentStatus.name() == 'PENDING'} ? 'payment-pending' : 'payment-paid'"
+                                  th:text="${booking.paymentStatus}">PENDING</span>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="actions">
+                        <a th:href="@{'/bookings/' + ${booking.id} + '/pay'}" class="btn-primary" th:if="${booking.paymentStatus.name() == 'PENDING'}">
+                            💳 Make Payment
+                        </a>
+                        <a href="/bookings" class="btn-secondary">View All Bookings</a>
+                        <a href="#" class="btn-danger" th:if="${booking.canBeCancelled()}">
+                            ❌ Cancel Booking
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Important Notes -->
+                <div class="important-notes">
+                    <h4>⚠️ Important Notes</h4>
+                    <ul>
+                        <li>Please carry a valid ID proof during travel</li>
+                        <li>Cancellation charges apply as per policy</li>
+                        <li>Contact us 48 hours before travel for any changes</li>
+                        <li>Payment must be completed 7 days before travel</li>
+                        <li>Check weather conditions before travel</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

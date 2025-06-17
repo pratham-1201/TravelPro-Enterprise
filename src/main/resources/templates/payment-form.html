@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">Payment - TravelPro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f7fa;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        /* Main Container */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Security Badge */
+        .security-badge {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #28a745;
+        }
+        
+        .security-badge i {
+            color: #28a745;
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+        }
+        
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 3rem;
+        }
+        
+        /* Payment Form */
+        .payment-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .form-section {
+            margin-bottom: 2rem;
+        }
+        
+        .form-section h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        /* Payment Methods */
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .payment-method {
+            position: relative;
+        }
+        
+        .payment-method input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+        
+        .payment-method label {
+            display: block;
+            padding: 1rem;
+            background: #f8f9fa;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .payment-method input[type="radio"]:checked + label {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .payment-method label:hover {
+            border-color: #667eea;
+        }
+        
+        .method-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        /* Payment Details */
+        .payment-details {
+            display: none;
+        }
+        
+        .payment-details.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .required {
+            color: #dc3545;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .help-text {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+        
+        /* Amount Input */
+        .amount-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+        
+        .amount-presets {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .amount-preset {
+            padding: 0.75rem;
+            background: white;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .amount-preset:hover {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+        
+        /* Order Summary */
+        .order-summary {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 2rem;
+        }
+        
+        .summary-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f8f9fa;
+        }
+        
+        .booking-ref {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .package-name {
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .amount-breakdown {
+            margin-bottom: 2rem;
+        }
+        
+        .amount-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem 0;
+        }
+        
+        .amount-row.highlight {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        
+        .amount-row.total {
+            border-top: 2px solid #e1e1e1;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        /* Submit Button */
+        .submit-section {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 2rem;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 1rem 3rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .cancel-link {
+            display: inline-block;
+            margin-top: 1rem;
+            color: #666;
+            text-decoration: none;
+        }
+        
+        .cancel-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Security Features */
+        .security-features {
+            background: #e7f3ff;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+            border-left: 4px solid #007bff;
+        }
+        
+        .security-features h4 {
+            color: #004085;
+            margin-bottom: 0.5rem;
+        }
+        
+        .security-features ul {
+            color: #004085;
+            margin-left: 1rem;
+        }
+        
+        .security-features li {
+            margin-bottom: 0.25rem;
+        }
+        
+        /* Loading State */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .payment-methods {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .form-row,
+            .form-row-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <a href="/" class="logo">🌍 TravelPro</a>
+            <div class="nav-links">
+                <a href="/dashboard">Dashboard</a>
+                <a href="/packages">Packages</a>
+                <a href="/bookings">My Bookings</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Security Badge -->
+        <div class="security-badge">
+            🔒 Your payment is secured with 256-bit SSL encryption
+        </div>
+
+        <!-- Content Grid -->
+        <div class="content-grid">
+            <!-- Payment Form -->
+            <div class="payment-form">
+                <form th:action="@{'/bookings/' + ${booking.id} + '/pay'}" method="post" id="paymentForm">
+                    <!-- Payment Amount -->
+                    <div class="form-section">
+                        <h3>Payment Amount</h3>
+                        <div class="amount-section">
+                            <div class="amount-presets" th:if="${pendingAmount > 1000}">
+                                <div class="amount-preset" onclick="setAmount(500)">₹500</div>
+                                <div class="amount-preset" onclick="setAmount(1000)">₹1000</div>
+                                <div class="amount-preset" onclick="setAmount(2000)" th:if="${pendingAmount >= 2000}">₹2000</div>
+                                <div class="amount-preset" onclick="setAmount(5000)" th:if="${pendingAmount >= 5000}">₹5000</div>
+                                <div class="amount-preset" th:onclick="'setAmount(' + ${pendingAmount} + ')'">Full</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="amount">Amount to Pay <span class="required">*</span></label>
+                                <input type="number" id="amount" name="amount" required 
+                                       th:value="${pendingAmount}" 
+                                       th:max="${pendingAmount}" 
+                                       min="10" step="1">
+                                <div class="help-text">Maximum: <span th:text="'₹' + ${pendingAmount}">₹10,000</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="form-section">
+                        <h3>Payment Method</h3>
+                        <div class="payment-methods">
+                            <div class="payment-method">
+                                <input type="radio" id="credit_card" name="paymentMethod" value="CREDIT_CARD" checked>
+                                <label for="credit_card">
+                                    <span class="method-icon">💳</span>
+                                    Credit Card
+                                </label>
+                            </div>
+                            <div class="payment-method">
+                                <input type="radio" id="debit_card" name="paymentMethod" value="DEBIT_CARD">
+                                <label for="debit_card">
+                                    <span class="method-icon">💳</span>
+                                    Debit Card
+                                </label>
+                            </div>
+                            <div class="payment-method">
+                                <input type="radio" id="upi" name="paymentMethod" value="UPI">
+                                <label for="upi">
+                                    <span class="method-icon">📱</span>
+                                    UPI
+                                </label>
+                            </div>
+                            <div class="payment-method">
+                                <input type="radio" id="net_banking" name="paymentMethod" value="NET_BANKING">
+                                <label for="net_banking">
+                                    <span class="method-icon">🏦</span>
+                                    Net Banking
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Details -->
+                    <div id="card-details" class="payment-details active">
+                        <div class="form-section">
+                            <h3>Card Details</h3>
+                            <div class="form-group">
+                                <label for="cardNumber">Card Number <span class="required">*</span></label>
+                                <input type="text" id="cardNumber" name="cardNumber" 
+                                       placeholder="1234 5678 9012 3456" maxlength="19">
+                            </div>
+                            <div class="form-group">
+                                <label for="cardHolderName">Card Holder Name <span class="required">*</span></label>
+                                <input type="text" id="cardHolderName" name="cardHolderName" 
+                                       placeholder="John Doe" th:value="${user.name}">
+                            </div>
+                            <div class="form-row-3">
+                                <div class="form-group">
+                                    <label for="expiryMonth">Expiry Month <span class="required">*</span></label>
+                                    <select id="expiryMonth" name="expiryMonth">
+                                        <option value="">MM</option>
+                                        <option value="01">01</option>
+                                        <option value="02">02</option>
+                                        <option value="03">03</option>
+                                        <option value="04">04</option>
+                                        <option value="05">05</option>
+                                        <option value="06">06</option>
+                                        <option value="07">07</option>
+                                        <option value="08">08</option>
+                                        <option value="09">09</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="expiryYear">Expiry Year <span class="required">*</span></label>
+                                    <select id="expiryYear" name="expiryYear">
+                                        <option value="">YYYY</option>
+                                        <option value="2024">2024</option>
+                                        <option value="2025">2025</option>
+                                        <option value="2026">2026</option>
+                                        <option value="2027">2027</option>
+                                        <option value="2028">2028</option>
+                                        <option value="2029">2029</option>
+                                        <option value="2030">2030</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="cvv">CVV <span class="required">*</span></label>
+                                    <input type="text" id="cvv" name="cvv" placeholder="123" maxlength="3">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- UPI Details -->
+                    <div id="upi-details" class="payment-details">
+                        <div class="form-section">
+                            <h3>UPI Details</h3>
+                            <div class="form-group">
+                                <label for="upiId">UPI ID <span class="required">*</span></label>
+                                <input type="text" id="upiId" name="upiId" 
+                                       placeholder="yourname@paytm">
+                                <div class="help-text">Enter your UPI ID (e.g., 9876543210@paytm)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Section -->
+                    <div class="submit-section">
+                        <button type="submit" class="submit-btn" id="submitBtn">
+                            🔒 Pay Securely
+                        </button>
+                        <div>
+                            <a th:href="@{'/bookings/' + ${booking.id}}" class="cancel-link">← Cancel Payment</a>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Loading State -->
+                <div class="loading" id="loadingState">
+                    <div class="spinner"></div>
+                    <h3>Processing Payment...</h3>
+                    <p>Please do not refresh or close this page</p>
+                </div>
+
+                <!-- Security Features -->
+                <div class="security-features">
+                    <h4>🛡️ Security Features</h4>
+                    <ul>
+                        <li>256-bit SSL encryption</li>
+                        <li>PCI DSS compliant</li>
+                        <li>No card details stored</li>
+                        <li>Instant transaction alerts</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="order-summary">
+                <div class="summary-header">
+                    <div class="booking-ref" th:text="${booking.bookingReference}">TP123456</div>
+                    <div class="package-name" th:text="${booking.travelPackage.name}">Package Name</div>
+                </div>
+
+                <div class="amount-breakdown">
+                    <div class="amount-row">
+                        <span>Total Booking Amount:</span>
+                        <span th:text="${booking.formattedTotalAmount}">₹15,000</span>
+                    </div>
+                    <div class="amount-row">
+                        <span>Already Paid:</span>
+                        <span th:text="'₹' + ${paidAmount}">₹5,000</span>
+                    </div>
+                    <div class="amount-row highlight">
+                        <span>Pending Amount:</span>
+                        <span th:text="'₹' + ${pendingAmount}">₹10,000</span>
+                    </div>
+                    <div class="amount-row total">
+                        <span>Paying Now:</span>
+                        <span id="payingAmount" th:text="'₹' + ${pendingAmount}">₹10,000</span>
+                    </div>
+                </div>
+
+                <div style="text-align: center; color: #666; font-size: 0.9rem;">
+                    <p>After payment, your booking will be confirmed</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Payment method switching
+        document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                // Hide all payment details
+                document.querySelectorAll('.payment-details').forEach(detail => {
+                    detail.classList.remove('active');
+                });
+                
+                // Show relevant payment details
+                if (this.value === 'CREDIT_CARD' || this.value === 'DEBIT_CARD') {
+                    document.getElementById('card-details').classList.add('active');
+                } else if (this.value === 'UPI') {
+                    document.getElementById('upi-details').classList.add('active');
+                }
+            });
+        });
+
+        // Amount presets
+        function setAmount(amount) {
+            document.getElementById('amount').value = amount;
+            updatePayingAmount();
+        }
+
+        // Update paying amount display
+        function updatePayingAmount() {
+            const amount = document.getElementById('amount').value;
+            if (amount) {
+                document.getElementById('payingAmount').textContent = '₹' + parseInt(amount).toLocaleString('en-IN');
+            }
+        }
+
+        document.getElementById('amount').addEventListener('input', updatePayingAmount);
+
+        // Card number formatting
+        document.getElementById('cardNumber').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+            if (formattedValue.length > 19) formattedValue = formattedValue.substr(0, 19);
+            e.target.value = formattedValue;
+        });
+
+        // CVV validation
+        document.getElementById('cvv').addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
+
+        // Form submission
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            // Show loading state
+            document.querySelector('.payment-form').style.display = 'none';
+            document.getElementById('loadingState').style.display = 'block';
+            
+            // Validate form
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+            
+            if (paymentMethod === 'CREDIT_CARD' || paymentMethod === 'DEBIT_CARD') {
+                const cardNumber = document.getElementById('cardNumber').value;
+                const cvv = document.getElementById('cvv').value;
+                
+                if (!cardNumber || cardNumber.replace(/\s/g, '').length < 16) {
+                    e.preventDefault();
+                    alert('Please enter a valid card number');
+                    document.querySelector('.payment-form').style.display = 'block';
+                    document.getElementById('loadingState').style.display = 'none';
+                    return;
+                }
+                
+                if (!cvv || cvv.length !== 3) {
+                    e.preventDefault();
+                    alert('Please enter a valid CVV');
+                    document.querySelector('.payment-form').style.display = 'block';
+                    document.getElementById('loadingState').style.display = 'none';
+                    return;
+                }
+            }
+            
+            if (paymentMethod === 'UPI') {
+                const upiId = document.getElementById('upiId').value;
+                if (!upiId || !upiId.includes('@')) {
+                    e.preventDefault();
+                    alert('Please enter a valid UPI ID');
+                    document.querySelector('.payment-form').style.display = 'block';
+                    document.getElementById('loadingState').style.display = 'none';
+                    return;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

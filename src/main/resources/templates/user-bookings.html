@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">My Bookings - TravelPro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f7fa;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Page Header */
+        .page-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+        
+        .page-header h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-header p {
+            color: #666;
+            font-size: 1.2rem;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: white;
+            border-radius: 10px;
+            padding: 0.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #666;
+        }
+        
+        .tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .tab:hover:not(.active) {
+            background: #f8f9fa;
+        }
+        
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Booking Cards */
+        .bookings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+        }
+        
+        .booking-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .booking-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .booking-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.5rem;
+        }
+        
+        .booking-ref {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .booking-date {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        
+        .booking-body {
+            padding: 2rem;
+        }
+        
+        .package-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .package-destination {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .booking-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-item {
+            text-align: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .info-label {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .info-value {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .status-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-confirmed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-completed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .payment-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .payment-paid {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .amount {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .booking-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 0.75rem;
+            border-radius: 8px;
+            text-decoration: none;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .empty-state img {
+            width: 150px;
+            opacity: 0.3;
+            margin-bottom: 2rem;
+        }
+        
+        .empty-state h3 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state p {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+        
+        .browse-packages-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+        
+        .browse-packages-btn:hover {
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .bookings-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .booking-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .booking-actions {
+                flex-direction: column;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <a href="/" class="logo">🌍 TravelPro</a>
+            <div class="nav-links">
+                <a href="/dashboard">Dashboard</a>
+                <a href="/packages">Packages</a>
+                <a href="/bookings">My Bookings</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>My Travel Bookings</h1>
+            <p>Manage and track all your travel reservations</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('all')">All Bookings</button>
+            <button class="tab" onclick="showTab('upcoming')">Upcoming</button>
+            <button class="tab" onclick="showTab('past')">Past Trips</button>
+        </div>
+
+        <!-- All Bookings Tab -->
+        <div id="all-tab" class="tab-content active">
+            <div class="bookings-grid" th:if="${allBookings != null and !allBookings.isEmpty()}">
+                <div class="booking-card" th:each="booking : ${allBookings}">
+                    <div class="booking-header">
+                        <div class="booking-ref" th:text="'Booking: ' + ${booking.bookingReference}">Booking: TP123456</div>
+                        <div class="booking-date" th:text="'Booked on ' + ${#temporals.format(booking.bookingDate, 'dd MMM yyyy')}">Booked on 01 Jan 2024</div>
+                    </div>
+                    <div class="booking-body">
+                        <h3 class="package-name" th:text="${booking.travelPackage.name}">Package Name</h3>
+                        <div class="package-destination">
+                            📍 <span th:text="${booking.travelPackage.destination}">Destination</span>
+                        </div>
+                        
+                        <div class="booking-info">
+                            <div class="info-item">
+                                <div class="info-label">Travel Date</div>
+                                <div class="info-value" th:text="${#temporals.format(booking.travelDate, 'dd MMM yyyy')}">15 Jan 2024</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Travelers</div>
+                                <div class="info-value" th:text="${booking.numberOfTravelers}">2</div>
+                            </div>
+                        </div>
+                        
+                        <div class="status-section">
+                            <div>
+                                <span class="status-badge" 
+                                      th:classappend="${booking.status.name() == 'PENDING'} ? 'status-pending' : 
+                                                     (${booking.status.name() == 'CONFIRMED'} ? 'status-confirmed' : 
+                                                     (${booking.status.name() == 'CANCELLED'} ? 'status-cancelled' : 'status-completed'))"
+                                      th:text="${booking.status}">PENDING</span>
+                                <span class="status-badge" 
+                                      th:classappend="${booking.paymentStatus.name() == 'PENDING'} ? 'payment-pending' : 'payment-paid'"
+                                      th:text="${booking.paymentStatus}">PENDING</span>
+                            </div>
+                            <div class="amount" th:text="${booking.formattedTotalAmount}">₹30,000</div>
+                        </div>
+                        
+                        <div class="booking-actions">
+                            <a th:href="@{'/bookings/' + ${booking.id}}" class="btn btn-primary">View Details</a>
+                            <a th:href="@{'/bookings/' + ${booking.id} + '/pay'}" class="btn btn-secondary" th:if="${booking.paymentStatus.name() == 'PENDING'}">Pay Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="empty-state" th:if="${allBookings == null or allBookings.isEmpty()}">
+                <h3>No Bookings Yet</h3>
+                <p>Start planning your next adventure! Browse our amazing travel packages and make your first booking.</p>
+                <a href="/packages" class="browse-packages-btn">Browse Packages</a>
+            </div>
+        </div>
+
+        <!-- Upcoming Bookings Tab -->
+        <div id="upcoming-tab" class="tab-content">
+            <div class="bookings-grid" th:if="${upcomingBookings != null and !upcomingBookings.isEmpty()}">
+                <div class="booking-card" th:each="booking : ${upcomingBookings}">
+                    <div class="booking-header">
+                        <div class="booking-ref" th:text="'Booking: ' + ${booking.bookingReference}">Booking: TP123456</div>
+                        <div class="booking-date" th:text="'Booked on ' + ${#temporals.format(booking.bookingDate, 'dd MMM yyyy')}">Booked on 01 Jan 2024</div>
+                    </div>
+                    <div class="booking-body">
+                        <h3 class="package-name" th:text="${booking.travelPackage.name}">Package Name</h3>
+                        <div class="package-destination">
+                            📍 <span th:text="${booking.travelPackage.destination}">Destination</span>
+                        </div>
+                        
+                        <div class="booking-info">
+                            <div class="info-item">
+                                <div class="info-label">Travel Date</div>
+                                <div class="info-value" th:text="${#temporals.format(booking.travelDate, 'dd MMM yyyy')}">15 Jan 2024</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Travelers</div>
+                                <div class="info-value" th:text="${booking.numberOfTravelers}">2</div>
+                            </div>
+                        </div>
+                        
+                        <div class="status-section">
+                            <div>
+                                <span class="status-badge" 
+                                      th:classappend="${booking.status.name() == 'PENDING'} ? 'status-pending' : 
+                                                     (${booking.status.name() == 'CONFIRMED'} ? 'status-confirmed' : 'status-cancelled')"
+                                      th:text="${booking.status}">PENDING</span>
+                                <span class="status-badge" 
+                                      th:classappend="${booking.paymentStatus.name() == 'PENDING'} ? 'payment-pending' : 'payment-paid'"
+                                      th:text="${booking.paymentStatus}">PENDING</span>
+                            </div>
+                            <div class="amount" th:text="${booking.formattedTotalAmount}">₹30,000</div>
+                        </div>
+                        
+                        <div class="booking-actions">
+                            <a th:href="@{'/bookings/' + ${booking.id}}" class="btn btn-primary">View Details</a>
+                            <a th:href="@{'/bookings/' + ${booking.id} + '/pay'}" class="btn btn-secondary" th:if="${booking.paymentStatus.name() == 'PENDING'}">Pay Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="empty-state" th:if="${upcomingBookings == null or upcomingBookings.isEmpty()}">
+                <h3>No Upcoming Trips</h3>
+                <p>Plan your next getaway! Check out our latest packages and book your dream destination.</p>
+                <a href="/packages" class="browse-packages-btn">Browse Packages</a>
+            </div>
+        </div>
+
+        <!-- Past Bookings Tab -->
+        <div id="past-tab" class="tab-content">
+            <div class="bookings-grid" th:if="${pastBookings != null and !pastBookings.isEmpty()}">
+                <div class="booking-card" th:each="booking : ${pastBookings}">
+                    <div class="booking-header">
+                        <div class="booking-ref" th:text="'Booking: ' + ${booking.bookingReference}">Booking: TP123456</div>
+                        <div class="booking-date" th:text="'Booked on ' + ${#temporals.format(booking.bookingDate, 'dd MMM yyyy')}">Booked on 01 Jan 2024</div>
+                    </div>
+                    <div class="booking-body">
+                        <h3 class="package-name" th:text="${booking.travelPackage.name}">Package Name</h3>
+                        <div class="package-destination">
+                            📍 <span th:text="${booking.travelPackage.destination}">Destination</span>
+                        </div>
+                        
+                        <div class="booking-info">
+                            <div class="info-item">
+                                <div class="info-label">Travel Date</div>
+                                <div class="info-value" th:text="${#temporals.format(booking.travelDate, 'dd MMM yyyy')}">15 Jan 2024</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Travelers</div>
+                                <div class="info-value" th:text="${booking.numberOfTravelers}">2</div>
+                            </div>
+                        </div>
+                        
+                        <div class="status-section">
+                            <div>
+                                <span class="status-badge status-completed">COMPLETED</span>
+                                <span class="status-badge payment-paid">PAID</span>
+                            </div>
+                            <div class="amount" th:text="${booking.formattedTotalAmount}">₹30,000</div>
+                        </div>
+                        
+                        <div class="booking-actions">
+                            <a th:href="@{'/bookings/' + ${booking.id}}" class="btn btn-primary">View Details</a>
+                            <a href="#" class="btn btn-secondary">Book Again</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="empty-state" th:if="${pastBookings == null or pastBookings.isEmpty()}">
+                <h3>No Past Trips</h3>
+                <p>Your travel history will appear here once you complete your trips.</p>
+                <a href="/packages" class="browse-packages-btn">Browse Packages</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">Dashboard - Travel Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f7fa;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .user-name {
+            font-weight: 500;
+        }
+        
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+            color: white;
+            text-decoration: none;
+        }
+        
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Welcome Section */
+        .welcome-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .welcome-section h1 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+        }
+        
+        .welcome-section p {
+            color: #666;
+            font-size: 1.2rem;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .stat-icon.bookings { background: linear-gradient(135deg, #ff6b6b, #ee5a24); }
+        .stat-icon.trips { background: linear-gradient(135deg, #4ecdc4, #44a08d); }
+        .stat-icon.savings { background: linear-gradient(135deg, #45b7d1, #96c93d); }
+        .stat-icon.rewards { background: linear-gradient(135deg, #f9ca24, #f0932b); }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 3rem;
+        }
+        
+        .quick-actions h2 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .action-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .action-icon {
+            font-size: 2rem;
+        }
+        
+        .action-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        /* Recent Activity */
+        .recent-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .recent-section h2 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-left: 4px solid #667eea;
+            background: #f8f9fa;
+            margin-bottom: 1rem;
+            border-radius: 5px;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.25rem;
+        }
+        
+        .activity-time {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        /* Profile Section */
+        .profile-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-top: 2rem;
+        }
+        
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .profile-info h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .profile-info p {
+            color: #666;
+        }
+        
+        .profile-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .detail-item {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.25rem;
+        }
+        
+        .detail-value {
+            color: #666;
+        }
+        
+        .edit-profile-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 1rem;
+            display: inline-block;
+            transition: transform 0.2s ease;
+        }
+        
+        .edit-profile-btn:hover {
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">🌍 TravelPro</div>
+            <div class="user-info">
+                <div class="user-avatar" th:text="${user.name.substring(0,1).toUpperCase()}">U</div>
+                <span class="user-name" th:text="${user.name}">User Name</span>
+                <a href="/logout" class="logout-btn">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Welcome Section -->
+        <section class="welcome-section">
+            <h1 th:text="'Welcome back, ' + ${user.name} + '!'">Welcome back, User!</h1>
+            <p>Ready for your next adventure? Let's plan something amazing!</p>
+        </section>
+
+        <!-- Stats Cards -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon bookings">📅</div>
+                <div class="stat-number">3</div>
+                <div class="stat-label">Active Bookings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon trips">✈️</div>
+                <div class="stat-number">12</div>
+                <div class="stat-label">Trips Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon savings">💰</div>
+                <div class="stat-number">₹85,000</div>
+                <div class="stat-label">Money Saved</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon rewards">🏆</div>
+                <div class="stat-number">2,450</div>
+                <div class="stat-label">Reward Points</div>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="quick-actions">
+            <h2>Quick Actions</h2>
+            <div class="actions-grid">
+                <a href="/packages" class="action-btn">
+                    <span class="action-icon">🏖️</span>
+                    <span class="action-text">Browse Packages</span>
+                </a>
+                <a href="/bookings" class="action-btn">
+                    <span class="action-icon">📋</span>
+                    <span class="action-text">My Bookings</span>
+                </a>
+                <a href="/profile" class="action-btn">
+                    <span class="action-icon">👤</span>
+                    <span class="action-text">Edit Profile</span>
+                </a>
+                <a href="/support" class="action-btn">
+                    <span class="action-icon">🎧</span>
+                    <span class="action-text">Get Support</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Recent Activity -->
+        <section class="recent-section">
+            <h2>Recent Activity</h2>
+            <div class="activity-item">
+                <div class="activity-icon">✅</div>
+                <div class="activity-content">
+                    <div class="activity-title">Booking Confirmed - Goa Beach Package</div>
+                    <div class="activity-time">2 days ago</div>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">💳</div>
+                <div class="activity-content">
+                    <div class="activity-title">Payment Successful - ₹15,000</div>
+                    <div class="activity-time">3 days ago</div>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">🔍</div>
+                <div class="activity-content">
+                    <div class="activity-title">Searched for "Hill Station Packages"</div>
+                    <div class="activity-time">1 week ago</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile Section -->
+        <section class="profile-section">
+            <div class="profile-header">
+                <div class="profile-avatar" th:text="${user.name.substring(0,1).toUpperCase()}">U</div>
+                <div class="profile-info">
+                    <h3 th:text="${user.name}">User Name</h3>
+                    <p th:text="'Member since ' + ${user.role}">Member since Customer</p>
+                </div>
+            </div>
+            
+            <div class="profile-details">
+                <div class="detail-item">
+                    <div class="detail-label">Email</div>
+                    <div class="detail-value" th:text="${user.email}">user@example.com</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Phone</div>
+                    <div class="detail-value" th:text="${user.phone != null ? user.phone : 'Not provided'}">Not provided</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Date of Birth</div>
+                    <div class="detail-value" th:text="${user.birthdate != null ? user.birthdate : 'Not provided'}">Not provided</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Aadhar Number</div>
+                    <div class="detail-value" th:text="${user.aadharNumber != null ? user.aadharNumber : 'Not provided'}">Not provided</div>
+                </div>
+            </div>
+            
+            <a href="/profile/edit" class="edit-profile-btn">Edit Profile</a>
+        </section>
+    </div>
+</body>
+</html>
